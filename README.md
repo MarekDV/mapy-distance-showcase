@@ -42,14 +42,19 @@ can still require several gigabytes of free memory while running.
 
 ## Installation
 
-In PowerShell:
+These steps are required only once. In PowerShell, from the project directory:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ollama pull gemma3:1b
 Copy-Item .env.example .env
+```
+
+If PowerShell cannot find `ollama`, use its standard Windows installation path:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" pull gemma3:1b
 ```
 
 Edit `.env` and replace the placeholder:
@@ -58,11 +63,36 @@ Edit `.env` and replace the placeholder:
 MAPY_API_KEY=your_real_key_here
 ```
 
-Start Ollama if it is not already running, then run:
+Keep `.env.example` as a safe template; `.env` is the private local copy and is
+ignored by Git.
+
+## Running the application
+
+After reopening Cursor, open this project and a PowerShell terminal in its root
+directory. You do **not** need to recreate `.venv`, reinstall packages, copy
+`.env`, or pull the model again.
+
+First verify that Ollama is available and that `gemma3:1b` is listed:
 
 ```powershell
-python main.py
+& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" list
 ```
+
+If that command reports that the Ollama server is unavailable, start it in a
+separate PowerShell terminal and leave that terminal open:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" serve
+```
+
+Then run the application from the project terminal:
+
+```powershell
+.\.venv\Scripts\python.exe main.py
+```
+
+Enter a sentence containing exactly two destinations. Enter `q`, `quit`, or
+`exit` at the main prompt to stop.
 
 ## Example
 
@@ -98,7 +128,7 @@ Never commit `.env`; it is intentionally ignored by Git.
 ## Tests
 
 ```powershell
-python -m pytest
+.\.venv\Scripts\python.exe -m pytest
 ```
 
 Tests mock external services and therefore require neither a live API key nor a
